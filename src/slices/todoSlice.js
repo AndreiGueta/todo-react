@@ -39,6 +39,7 @@ export const todoSlice = createSlice({
           ])
         );
       }
+      // console.log(todoListArr);
     },
     updateTodo: (state, action) => {
       const todoList = window.localStorage.getItem('todoList');
