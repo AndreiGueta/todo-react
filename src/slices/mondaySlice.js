@@ -30,33 +30,33 @@ const monday = mondaySdk({
 const MONDAY_STORAGE_KEY = "TODO_LIST_KEY";
 
 const getInitialTodo = () => {
-    let localTodoList = window.localStorage.getItem(MONDAY_STORAGE_KEY);
-    // let mondayTodoList = monday.storage.instance.getItem(MONDAY_STORAGE_KEY);
-    let todoList = [];
+    const localTodoList = window.localStorage.getItem(MONDAY_STORAGE_KEY);
+    const mondayTodoList = monday.storage.instance.getItem(MONDAY_STORAGE_KEY);
 
-    if (localTodoList) {
-        todoList = JSON.parse(localTodoList);
-        return localTodoList;
+    if (localTodoList && mondayTodoList) {
+        // todoList = JSON.parse(localTodoList, mondayTodoList);
+        return JSON.parse(localTodoList, mondayTodoList);
     }
-
-    monday.storage.instance
-        .setItem(MONDAY_STORAGE_KEY, [todoList])
-        .then((res) => {
-            console.log("successful update of " + [MONDAY_STORAGE_KEY]);
-            console.log(res.args.value);
-            return [];
-        });
-
-    window.localStorage.setItem('todoList', []);
-    monday.storage.instance.getItem(MONDAY_STORAGE_KEY).then((res) => {
-        if (res) {
-            console.log("get data from monday using key: " + MONDAY_STORAGE_KEY);
-            console.log([todoList]);
-        }
-    });
-
-    return todoList;
+    monday.storage.instance.setItem(MONDAY_STORAGE_KEY, []);
+    return [];
 };
+
+    // monday.storage.instance
+    //     .setItem(MONDAY_STORAGE_KEY, [todoList])
+    //     .then((res) => {
+    //         console.log("successful update of " + [MONDAY_STORAGE_KEY]);
+    //         console.log(res.args.value);
+    //         return [];
+    //     });
+
+    // monday.storage.instance.getItem(MONDAY_STORAGE_KEY).then((res) => {
+    //     if (res) {
+    //         console.log("get data from monday using key: " + MONDAY_STORAGE_KEY);
+    //         console.log([todoList]);
+    //     }
+    // });
+
+    // return todoList;
 
 const initialValue = {
     filterStatus: "all",
