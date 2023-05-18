@@ -37,6 +37,7 @@ const getInitialTodo = () => {
         // todoList = JSON.parse(localTodoList, mondayTodoList);
         return JSON.parse(localTodoList, mondayTodoList);
     }
+    window.localStorage.setItem(MONDAY_STORAGE_KEY, []);
     monday.storage.instance.setItem(MONDAY_STORAGE_KEY, []);
     return [];
 };
@@ -76,16 +77,12 @@ export const mondaySlice = createSlice({
                 todoListArr.push({
                     ...action.payload,
                 });
+                window.localStorage.setItem('todoList', JSON.stringify(todoListArr));
                 monday.storage.instance.setItem('todoList', JSON.stringify(todoListArr));
+                console.log(todoListArr);
             } else {
-                monday.storage.instance.setItem(
-                    'todoList',
-                    JSON.stringify([
-                        {
-                            ...action.payload,
-                        },
-                    ])
-                );
+                window.localStorage.setItem('todoList', JSON.stringify([{...action.payload }]));
+                monday.storage.instance.setItem('todoList', JSON.stringify([{...action.payload }]));
             }
         },
 
