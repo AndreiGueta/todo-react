@@ -69,29 +69,16 @@ export const mondaySlice = createSlice({
     reducers: {
         addTodo: (state, action) => {
             state.todoList.push(action.payload);
-            window.localStorage.setItem("todoList", JSON.stringify(state.todoList));
-            const todoListString = window.localStorage.getItem("todoList");
-            if (todoListString) {
-                const todoListArr = JSON.parse(todoListString);
-            todoListArr.push({...action.payload});
-                monday.storage.instance.setItem('todoList', JSON.stringify(todoListArr));
-            } else {
-                monday.storage.instance.setItem('todoList', JSON.stringify([{...action.payload}]));
-            }
-            // update local storage
-            window.localStorage.setItem(
-                "todoList",
-                JSON.stringify(...action.payload),
-            );
-            const todoList = monday.storage.instance.getItem('todoList');
+            const todoList = window.localStorage.getItem('todoList');
+            const todoListMonday = monday.storage.instance.getItem('todoList');
             if (todoList) {
-                const todoListArr = JSON.parse(state.todoList, ...action.payload);
+                const todoListArr = JSON.parse(todoList, todoListMonday);
                 todoListArr.push({
                     ...action.payload,
                 });
-                window.localStorage.setItem('todoList', JSON.stringify(todoListArr));
+                monday.storage.instance.setItem('todoList', JSON.stringify(todoListArr));
             } else {
-                window.localStorage.setItem(
+                monday.storage.instance.setItem(
                     'todoList',
                     JSON.stringify([
                         {
@@ -100,19 +87,13 @@ export const mondaySlice = createSlice({
                     ])
                 );
             }
-            //recent
-            window.localStorage.setItem("todoList", JSON.stringify(action.payload));
-            console.log(action.payload);
-
-            // update monday storage
-            monday.storage.instance.setItem(MONDAY_STORAGE_KEY, state.todoList);
         },
 
         updateTodo: (state, action) => {
             const todoList = window.localStorage.getItem('todoList');
-            //   const todoList = monday.storage.instance.getItem('todoList');
-            if (todoList) {
-                const todoListArr = JSON.parse(todoList);
+            const todoListMonday = monday.storage.instance.getItem('todoList');
+            if (todoList && todoListMonday) {
+                const todoListArr = JSON.parse(todoList, todoListMonday);
                 todoListArr.forEach((todo) => {
                     if (todo.id === action.payload.id) {
                         todo.status = action.payload.status;
@@ -120,23 +101,15 @@ export const mondaySlice = createSlice({
                     }
                 });
                 window.localStorage.setItem('todoList', JSON.stringify(todoListArr));
-                monday.storage.instance.setItem(
-                    "todoList",
-                    JSON.stringify(todoListArr),
-                );
-                window.localStorage.setItem(
-                    "todoList",
-                    JSON.stringify(todoListArr),
-                );
-                console.log(todoListArr);
+                monday.storage.instance.setItem('todoList', JSON.stringify(todoListArr));
                 state.todoList = [...todoListArr];
             }
         },
         deleteTodo: (state, action) => {
             const todoList = window.localStorage.getItem('todoList');
-            // const todoList = monday.storage.instance.getItem("todoList");
-            if (todoList) {
-                const todoListArr = JSON.parse(todoList);
+            const todoListMonday = monday.storage.instance.getItem("todoList");
+            if (todoList && todoListMonday) {
+                const todoListArr = JSON.parse(todoList, todoListMonday);
                 console.log(todoListArr);
                 todoListArr.forEach((todo, index) => {
                     if (todo.id === action.payload) {
