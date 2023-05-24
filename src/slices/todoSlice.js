@@ -32,9 +32,13 @@ export const todoSlice = createSlice({
       } else {
         window.localStorage.setItem(
           'todoList',
-          JSON.stringify([{...action.payload,}]));
+          JSON.stringify([
+            {
+              ...action.payload,
+            },
+          ])
+        );
       }
-      // console.log(todoListArr);
     },
     updateTodo: (state, action) => {
       const todoList = window.localStorage.getItem('todoList');

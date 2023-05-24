@@ -1,10 +1,10 @@
 import { createSlice } from "@reduxjs/toolkit";
 import mondaySdk from "monday-sdk-js";
 
-const monday = mondaySdk({
-    token: "eyJhbGciOiJIUzI1NiJ9.eyJ0aWQiOjI1NjA3NTU0NSwiYWFpIjoxMSwidWlkIjo0MjQ5NjA4NiwiaWFkIjoiMjAyMy0wNS0xMlQwOTo0NDoxMC4wMDBaIiwicGVyIjoibWU6d3JpdGUiLCJhY3RpZCI6MTA1NzY5NzEsInJnbiI6InVzZTEifQ.PcE-YncCh0ZF1M0gB22j9vtgTciwQng895rZ0DhyA5M",
-    clientId: "5d6607a9b907fb548a4f29560512f48a"
+const monday = mondaySdk({ token: "eyJhbGciOiJIUzI1NiJ9.eyJ0aWQiOjI1NjA3NTU0NSwiYWFpIjoxMSwidWlkIjo0MjQ5NjA4NiwiaWFkIjoiMjAyMy0wNS0xMlQwOTo0NDoxMC4wMDBaIiwicGVyIjoibWU6d3JpdGUiLCJhY3RpZCI6MTA1NzY5NzEsInJnbiI6InVzZTEifQ.PcE-YncCh0ZF1M0gB22j9vtgTciwQng895rZ0DhyA5M",
+                            clientId: "5d6607a9b907fb548a4f29560512f48a"                        
 });
+
 
 // monday.setToken(
 //     'eyJhbGciOiJIUzI1NiJ9.eyJ0aWQiOjI1NjA3NTU0NSwiYWFpIjoxMSwidWlkIjo0MjQ5NjA4NiwiaWFkIjoiMjAyMy0wNS0xMlQwOTo0NDoxMC44NDlaIiwicGVyIjoibWU6d3JpdGUiLCJhY3RpZCI6MTA1NzY5NzEsInJnbiI6InVzZTEifQ.4_YAG6TkH-1k_aRYe9aw1CX5rYDNfkc9NJRYNcvFqSM'
@@ -30,34 +30,32 @@ const monday = mondaySdk({
 const MONDAY_STORAGE_KEY = "TODO_LIST_KEY";
 
 const getInitialTodo = () => {
-    const localTodoList = window.localStorage.getItem(MONDAY_STORAGE_KEY);
-    const mondayTodoList = monday.storage.instance.getItem(MONDAY_STORAGE_KEY);
+    let localTodoList = window.localStorage.getItem(MONDAY_STORAGE_KEY);
+    let todoList = [];
 
-    if (localTodoList && mondayTodoList) {
-        // todoList = JSON.parse(localTodoList, mondayTodoList);
-        return JSON.parse(localTodoList, mondayTodoList);
+    if (localTodoList) {
+        todoList = JSON.parse(localTodoList);
+        return localTodoList;
     }
-    window.localStorage.setItem(MONDAY_STORAGE_KEY, []);
-    monday.storage.instance.setItem(MONDAY_STORAGE_KEY, []);
-    return [];
+
+    monday.storage.instance
+        .setItem(MONDAY_STORAGE_KEY, [todoList])
+        .then((res) => {
+            console.log("successful update of " + [MONDAY_STORAGE_KEY]);
+            console.log(res.args.value);
+            return [];
+        });
+
+    // window.localStorage.setItem('todoList', []);
+    monday.storage.instance.getItem(MONDAY_STORAGE_KEY).then((res) => {
+        if (res){
+            console.log("get data from monday using key: " + MONDAY_STORAGE_KEY);
+            console.log([todoList]);
+        }
+    });
+
+    return todoList;
 };
-
-    // monday.storage.instance
-    //     .setItem(MONDAY_STORAGE_KEY, [todoList])
-    //     .then((res) => {
-    //         console.log("successful update of " + [MONDAY_STORAGE_KEY]);
-    //         console.log(res.args.value);
-    //         return [];
-    //     });
-
-    // monday.storage.instance.getItem(MONDAY_STORAGE_KEY).then((res) => {
-    //     if (res) {
-    //         console.log("get data from monday using key: " + MONDAY_STORAGE_KEY);
-    //         console.log([todoList]);
-    //     }
-    // });
-
-    // return todoList;
 
 const initialValue = {
     filterStatus: "all",
@@ -70,51 +68,81 @@ export const mondaySlice = createSlice({
     reducers: {
         addTodo: (state, action) => {
             state.todoList.push(action.payload);
-            const todoList = window.localStorage.getItem('todoList');
-            const todoListMonday = monday.storage.instance.getItem('todoList');
-            if (todoList) {
-                const todoListArr = JSON.parse(todoList, todoListMonday);
-                todoListArr.push({
-                    ...action.payload,
-                });
-                window.localStorage.setItem('todoList', JSON.stringify(todoListArr));
-                monday.storage.instance.setItem('todoList', JSON.stringify(todoListArr));
-                console.log(todoListArr);
-            } else {
-                window.localStorage.setItem('todoList', JSON.stringify([{...action.payload }]));
-                monday.storage.instance.setItem('todoList', JSON.stringify([{...action.payload }]));
-            }
-        },
+            
+            // monday.storage.instance.setItem("todoList", JSON.stringify("todoList"));
+            // const todoListString = monday.storage.instance.getItem("todoList");
+            // if (todoListString) {
+            //     const todoListArr = JSON.parse(todoListString);
+            // todoListArr.push({...action.payload});
+            //     monday.storage.instance.setItem('todoList', JSON.stringify(todoListArr));
+            // } else {
+            //     monday.storage.instance.setItem('todoList', JSON.stringify([{...action.payload}]));
+            // }
+            // update local storage
+            // window.localStorage.setItem(
+            //     "todoList",
+            //     JSON.stringify(state.todoList, ...action.payload),
+            // );
 
+            //recent
+            monday.storage.instance.setItem(
+                    "todoList",
+                    JSON.stringify(action.payload),
+                );
+            console.log(action.payload);
+
+            // update monday storage
+            // monday.storage.instance.setItem(MONDAY_STORAGE_KEY, state.todoList);
+        },
+        
+          
         updateTodo: (state, action) => {
-            const todoList = window.localStorage.getItem('todoList');
-            const todoListMonday = monday.storage.instance.getItem('todoList');
-            if (todoList && todoListMonday) {
-                const todoListArr = JSON.parse(todoList, todoListMonday);
+              const todoList = window.localStorage.getItem('todoList');
+            // const todoList = monday.storage.instance.getItem('todoList');
+            if (todoList) {
+                const todoListArr = JSON.parse(todoList);
                 todoListArr.forEach((todo) => {
                     if (todo.id === action.payload.id) {
                         todo.status = action.payload.status;
                         todo.title = action.payload.title;
                     }
                 });
-                window.localStorage.setItem('todoList', JSON.stringify(todoListArr));
-                monday.storage.instance.setItem('todoList', JSON.stringify(todoListArr));
+                // window.localStorage.setItem('todoList', JSON.stringify(todoListArr));
+                monday.storage.instance.setItem(
+                    "todoList",
+                    JSON.stringify(todoListArr),
+                );
+                // window.localStorage.setItem(
+                //     "todoList",
+                //     JSON.stringify(todoListArr),
+                // );
+                console.log(todoListArr);
                 state.todoList = [...todoListArr];
+
             }
+
         },
         deleteTodo: (state, action) => {
-            const todoList = window.localStorage.getItem('todoList');
-            const todoListMonday = monday.storage.instance.getItem("todoList");
-            if (todoList && todoListMonday) {
-                const todoListArr = JSON.parse(todoList, todoListMonday);
+              const todoList = window.localStorage.getItem('todoList');
+            // const todoList = monday.storage.instance.getItem("todoList");
+            if (todoList) {
+                const todoListArr = JSON.parse(todoList);
                 console.log(todoListArr);
                 todoListArr.forEach((todo, index) => {
                     if (todo.id === action.payload) {
                         todoListArr.splice(index, 1);
                     }
                 });
-                window.localStorage.setItem('todoList', JSON.stringify(todoListArr));
-                monday.storage.instance.setItem("todoList", JSON.stringify(todoListArr));
+                // window.localStorage.setItem('todoList', JSON.stringify(todoListArr));
+                monday.storage.instance.setItem(
+                    "todoList",
+                    JSON.stringify(todoListArr),
+                );
+
+                // window.localStorage.setItem(
+                //     "todoList",
+                //     JSON.stringify(todoListArr),
+                // );
                 state.todoList = todoListArr;
 
 
@@ -123,8 +151,7 @@ export const mondaySlice = createSlice({
         updateFilterStatus: (state, action) => {
             state.filterStatus = action.payload;
         },
-    }
-
+    },
 });
 
 export const { addTodo, updateTodo, deleteTodo, updateFilterStatus } =
