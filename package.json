@@ -30,9 +30,6 @@
     "redux": "^4.2.1",
     "uuid": "^8.3.2"
   },
-  "eslintConfig": {
-    "extends": "react-app"
-  },
   "browserslist": {
     "production": [
       ">0.2%",

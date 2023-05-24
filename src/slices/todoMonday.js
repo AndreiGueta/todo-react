@@ -79,6 +79,7 @@ export const todoMonday = createSlice({
     },
     updateFilterStatus: (state, action) => {
       state.filterStatus = action.payload;
+      
     },
   },
   options: await initialValue(),
